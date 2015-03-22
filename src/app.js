@@ -119,22 +119,25 @@ main.show();
 main.on('click', 'up', function(e) {
   console.log("Clicked Up from Main Menu");
 //   showSuspectMenu();
-  showChallengeCardAtIndex(0);
+//   showChallengeCardAtIndex(0);
 });
 
+var lastChallengeIndex = 0;
 main.on('click', 'select', function(e) {
   console.log("Clicked Select from Main Menu");
-  showSuspectMenu();
+//   showSuspectMenu();
+  showChallengeCardAtIndex(lastChallengeIndex);
+  countStep();
 });
 
 main.on('click', 'down', function(e) {
   console.log("Clicked Down from Main Menu");
-  showSuspectMenu();
+//   showSuspectMenu();
 });
-
 
 function showChallengeCardAtIndex(index){
   console.log("Show Challenge Card at Index");
+  lastChallengeIndex = index;
   
   var card = new UI.Card();
   card.title('Walk');
@@ -146,17 +149,17 @@ function showChallengeCardAtIndex(index){
   
   card.on('click', 'up', function(e) {
   console.log("Clicked Up from Challenge Card");
-  showClueCardAtIndex(index);
+//   showClueCardAtIndex(index);
 });
 
   card.on('click', 'select', function(e) {
   console.log("Clicked Select from Challenge Card");
-  showClueCardAtIndex(index);
+//   showClueCardAtIndex(index);
 });
 
   card.on('click', 'down', function(e) {
   console.log("Clicked Down from Challenge Card");
-  showClueCardAtIndex(index);
+//   showClueCardAtIndex(index);
 });
 }
 
@@ -259,6 +262,11 @@ function countStep(){
   if (g!==0)
     {
       steps++;
+      if (steps == 5){
+        console.log("5 steps taken");
+        showClueCardAtIndex(lastChallengeIndex);
+        steps = 0;
+      }
       setDelay();
     }
   return steps;
