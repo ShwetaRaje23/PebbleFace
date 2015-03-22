@@ -4,8 +4,6 @@
  * This is where you write your app.
  */
 
-var UI = require('ui');
-var Vector2 = require('vector2');
 
 var story = {
   "characters": [
@@ -216,6 +214,9 @@ var story = {
     }]
 };
 
+var UI = require('ui');
+var ajax = require('ajax');
+
 var main = new UI.Card({
   title: 'Pebble.js',
   icon: 'images/menu_icon.png',
@@ -245,17 +246,35 @@ main.on('click', 'up', function(e) {
   menu.show();
 });
 
+// Create a new card in which to show our stellar wearable concepts.
+var conceptCard = new UI.Card({scrollable: true, style: 'small'});
+
+// We need this function so that we can use it in two different cases.
+function doThing() {
+  // Loading this could take some time; it'd be a good idea to show something/
+  // while they wait.
+  conceptCard.body('Loading...');
+  // This makes a simple 'GET' request to our API; 'type': 'json' makes it parse out
+  // the JSON into something we can use.
+  ajax({url: 'http://wearables-api.herokuapp.com/phrase', 'type': 'json'},
+      function(data) {
+        // It worked! Construct a sentence to show on screen.
+        conceptCard.body(data.preamble + " " + data.thing + ".\n\n" + data.action);
+      }, function(data) {
+        // It didn't work. :(
+        conceptCard.body("I don't know. :(");
+      });
+}
+
+conceptCard.on('click', 'select', doThing);
+
 main.on('click', 'select', function(e) {
-  var wind = new UI.Window();
-  var textfield = new UI.Text({
-    position: new Vector2(0, 50),
-    size: new Vector2(144, 30),
-    font: 'gothic-24-bold',
-    text: 'Text Anywhere!',
-    textAlign: 'center'
-  });
-  wind.add(textfield);
-  wind.show();
+  // Do the thing! As defined above.
+  doThing();
+  // When they press the select button, we want to get them another quote.
+  // Let's do the thing again.
+  // Finally, make sure it actually shows up on-screen.
+  conceptCard.show();
 });
 
 main.on('click', 'down', function(e) {
