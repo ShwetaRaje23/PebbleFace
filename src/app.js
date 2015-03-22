@@ -126,8 +126,9 @@ var lastChallengeIndex = 0;
 main.on('click', 'select', function(e) {
   console.log("Clicked Select from Main Menu");
 //   showSuspectMenu();
+  
   showChallengeCardAtIndex(lastChallengeIndex);
-  countStep();
+  
 });
 
 main.on('click', 'down', function(e) {
@@ -138,7 +139,7 @@ main.on('click', 'down', function(e) {
 function showChallengeCardAtIndex(index){
   console.log("Show Challenge Card at Index");
   lastChallengeIndex = index;
-  
+   var walk;
   var card = new UI.Card();
   card.title('Walk');
   card.subtitle(getChallengeTimeAtIndex(index));
@@ -146,10 +147,18 @@ function showChallengeCardAtIndex(index){
   card.show();
   
   Vibe.vibrate('short');
+  steps=0;
+  for (var loop = 0;loop<5;loop++)
+    {
+       walk = countStep();
+    }
+  card.title(" You walked "+walk+ "steps");
+  showClueCardAtIndex(index);
+  
   
   card.on('click', 'up', function(e) {
   console.log("Clicked Up from Challenge Card");
-//   showClueCardAtIndex(index);
+  // showClueCardAtIndex(index);
 });
 
   card.on('click', 'select', function(e) {
@@ -250,23 +259,23 @@ function countStep(){
         g = (e.accel.x*e.accel.y*e.accel.z);
         console.log("g  :  " + g );
       });
-      Accel.on('tap', function(e) {
-      console.log('Tap event on axis: ' + e.axis + ' and direction: ' + e.direction);
-    });
-      Accel.on('data', function(e) {
- // console.log('Just received ' + e.samples + ' from the accelerometer.');
-});
+//       Accel.on('tap', function(e) {
+//       console.log('Tap event on axis: ' + e.axis + ' and direction: ' + e.direction);
+//     });
+//       Accel.on('data', function(e) {
+//  // console.log('Just received ' + e.samples + ' from the accelerometer.');
+// });
   
  // if (g!==0)
    // {
       steps++;
-      if (steps == 5){
-        console.log("5 steps taken" , + steps);
-        showClueCardAtIndex(lastChallengeIndex);
-        steps = 0;
-  //    }
+//       if (steps == 5){
+//         console.log("5 steps taken" , + steps);
+//         showClueCardAtIndex(lastChallengeIndex);
+//         steps = 0;
+//   //    }
       setDelay();
-    }
+//    }
   return steps;
 }
 
