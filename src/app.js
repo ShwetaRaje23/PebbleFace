@@ -4,6 +4,7 @@
  * This is where you write your app.
  */
 //Story Data
+var steps=0;
 var story = {
   "characters": [
     {
@@ -79,6 +80,9 @@ var story = {
       "clue_id":6
     }]
 };
+
+var Accel = require('ui/accel');
+Accel.init();
 
 //Story Functions
 
@@ -233,7 +237,40 @@ function showSuspectMenu() {
   // Show the new Card
   detailCard.show();
 });
+} 
+
+function countStep(){
+  var g;
+     for (var getacc = 1 ; getacc < 1000 ; getacc++)
+      {
+        Accel.peek(function(e) {
+        console.log('Current acceleration on axis are: X=' + e.accel.x + ' Y=' + e.accel.y + ' Z=' + e.accel.z);
+        g = ((e.accel.x*e.accel.x) + (e.accel.y*e.accel.y) + (e.accel.z*e.accel.z) ) /(9.8*9.8);
+        console.log("g  :  " + g );
+      });
+    }
+      Accel.on('tap', function(e) {
+      console.log('Tap event on axis: ' + e.axis + ' and direction: ' + e.direction);
+    });
+      Accel.on('data', function(e) {
+ // console.log('Just received ' + e.samples + ' from the accelerometer.');
+});
   
+  if (g!==0)
+    {
+      steps++;
+      setDelay();
+    }
+  return steps;
+}
+
+function setDelay(){
+  setTimeout(function(){
+    console.log("Logging steps");
+}, 400);
+  
+}
+
   // This makes a simple 'GET' request to our API; 'type': 'json' makes it parse out
   // the JSON into something we can use.
 //   ajax({url: 'http://wearables-api.herokuapp.com/phrase', 'type': 'json'},
@@ -244,6 +281,5 @@ function showSuspectMenu() {
 //         // It didn't work. :(
 //         conceptCard.body("I don't know. :(");
 //       });
-}
 
 //conceptCard.on('click', 'select', doThing);
