@@ -244,14 +244,12 @@ function showSuspectMenu() {
 
 function countStep(){
   var g;
-     for (var getacc = 1 ; getacc < 1000 ; getacc++)
-      {
+     
         Accel.peek(function(e) {
         console.log('Current acceleration on axis are: X=' + e.accel.x + ' Y=' + e.accel.y + ' Z=' + e.accel.z);
-        g = ((e.accel.x*e.accel.x) + (e.accel.y*e.accel.y) + (e.accel.z*e.accel.z) ) /(9.8*9.8);
+        g = (e.accel.x*e.accel.y*e.accel.z);
         console.log("g  :  " + g );
       });
-    }
       Accel.on('tap', function(e) {
       console.log('Tap event on axis: ' + e.axis + ' and direction: ' + e.direction);
     });
@@ -259,14 +257,14 @@ function countStep(){
  // console.log('Just received ' + e.samples + ' from the accelerometer.');
 });
   
-  if (g!==0)
-    {
+ // if (g!==0)
+   // {
       steps++;
       if (steps == 5){
-        console.log("5 steps taken");
+        console.log("5 steps taken" , + steps);
         showClueCardAtIndex(lastChallengeIndex);
         steps = 0;
-      }
+  //    }
       setDelay();
     }
   return steps;
