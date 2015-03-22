@@ -107,6 +107,10 @@ var UI = require('ui');
 var Vibe = require('ui/vibe');
 //var ajax = require('ajax');
 
+//Flags
+var lastGWasPositive = false;
+var isShowingChallengeCard = true;
+
 var main = new UI.Card({
   title: 'GWAP Walk!',
   icon: 'images/menu_icon.png',
@@ -116,19 +120,16 @@ var main = new UI.Card({
 
 main.show();
 
+var lastChallengeIndex = 0;
 main.on('click', 'up', function(e) {
   console.log("Clicked Up from Main Menu");
-//   showSuspectMenu();
-//   showChallengeCardAtIndex(0);
+  showChallengeCardAtIndex(lastChallengeIndex);
 });
 
-var lastChallengeIndex = 0;
+
 main.on('click', 'select', function(e) {
   console.log("Clicked Select from Main Menu");
 //   showSuspectMenu();
-  
-  showChallengeCardAtIndex(lastChallengeIndex);
-  
 });
 
 main.on('click', 'down', function(e) {
@@ -137,9 +138,11 @@ main.on('click', 'down', function(e) {
 });
 
 function showChallengeCardAtIndex(index){
+  isShowingChallengeCard = true;
   console.log("Show Challenge Card at Index");
   lastChallengeIndex = index;
-   var walk;
+  var walk;
+  
   var card = new UI.Card();
   card.title('Walk');
   card.subtitle(getChallengeTimeAtIndex(index));
@@ -148,38 +151,20 @@ function showChallengeCardAtIndex(index){
   
   Vibe.vibrate('short');
   steps=0;
-  for (var loop = 0;loop<5;loop++)
-    {
-       walk = countStep();
-    }
-  card.title(" You walked "+walk+ "steps");
-  showClueCardAtIndex(index);
-  
-  
-  card.on('click', 'up', function(e) {
-  console.log("Clicked Up from Challenge Card");
-  // showClueCardAtIndex(index);
-});
-
-  card.on('click', 'select', function(e) {
-  console.log("Clicked Select from Challenge Card");
-//   showClueCardAtIndex(index);
-});
-
-  card.on('click', 'down', function(e) {
-  console.log("Clicked Down from Challenge Card");
-//   showClueCardAtIndex(index);
-});
+  walk = countStep();
 }
 
 
 
 function showClueCardAtIndex(index){
+  
+  isShowingChallengeCard = false;
   console.log("Show Clue Card at Index");
+  Vibe.vibrate('short');
   
   var card = new UI.Card();
   card.title(getChallengeTimeAtIndex(index));
-  card.body(getClueAtIndex(index));
+  card.body(getClueAtIndex(index) + " Continue ? Press anything.");
   card.show();
   
   card.on('click', 'up', function(e) {
@@ -188,34 +173,60 @@ function showClueCardAtIndex(index){
        showChallengeCardAtIndex(index+1); 
     }else{
       console.log("All clues done");
-      showSuspectMenu();
+      showSuspectCard();
     }
 });
 
   card.on('click', 'select', function(e) {
-  console.log("Clicked Select from Challenge Card");
-  if (index < (getNumberOfChallenges() -1)){
+  console.log("Clicked Up from Challenge Card");
+    if (index < (getNumberOfChallenges() -1)){
        showChallengeCardAtIndex(index+1); 
     }else{
       console.log("All clues done");
-      showSuspectMenu();
+      showSuspectCard();
     }
 });
 
   card.on('click', 'down', function(e) {
-  console.log("Clicked Down from Challenge Card");
-  if (index < (getNumberOfChallenges() -1)){
+  console.log("Clicked Up from Challenge Card");
+    if (index < (getNumberOfChallenges() -1)){
        showChallengeCardAtIndex(index+1); 
     }else{
       console.log("All clues done");
-      showSuspectMenu();
+      showSuspectCard();
     }
 });
 }
 
+
+function showSuspectCard(){
+  
+  isShowingChallengeCard = false;
+  console.log("Show Suspect Card at Index");
+  
+  var card = new UI.Card();
+  card.title("Who is the murderer ?");
+  card.body("Click any button to accuse a member of the household");
+  card.show();
+  
+  card.on('click', 'up', function(e) {
+    showSuspectMenu();
+});
+
+  card.on('click', 'select', function(e) {
+    showSuspectMenu();
+});
+
+  card.on('click', 'down', function(e) {
+    showSuspectMenu();
+});
+}
+
+
 var conceptCard = new UI.Card({scrollable: true, style: 'small'});
 function showSuspectMenu() {
   
+  isShowingChallengeCard = false;
   console.log("Showing Suspect Menu");
   
   // Loading this could take some time; it'd be a good idea to show something/
@@ -233,55 +244,77 @@ function showSuspectMenu() {
   
   // Add a click listener for select button click
   fruitMenu.on('select', function(event) {
-   console.log(" detailCard jjj" );
   // Show a card with clicked item details
   var detailCard = new UI.Card({
+    scrollable:true,
     title: story.characters[event.itemIndex].title,
-    body: story.characters[event.itemIndex].subtitle
+    subtitle: "It was the Brother",
+    body: story.motive,
   });
   
- console.log("event     " + event.itemIndex );
- console.log("Hi");
-  if (event.itemIndex == 2)    
-    detailCard.body(" You have found the killer !");
+//     detailCard.subtitle("It was the Brother");
+//     detailCard.body(story.motive);
+  if (event.itemIndex == 2)
+    detailCard.title("Solved !");
   else
-    detailCard.body(" Oops ! You have to try again ");
+    detailCard.title("Maybe you're not Sherlock");
+  
   // Show the new Card
   detailCard.show();
 });
 } 
 
+// var g = 0;
 function countStep(){
-  var g;
-     
-        Accel.peek(function(e) {
-        console.log('Current acceleration on axis are: X=' + e.accel.x + ' Y=' + e.accel.y + ' Z=' + e.accel.z);
-        g = (e.accel.x*e.accel.y*e.accel.z);
-        console.log("g  :  " + g );
-      });
-//       Accel.on('tap', function(e) {
+
+    Accel.on('tap', function(e) {
 //       console.log('Tap event on axis: ' + e.axis + ' and direction: ' + e.direction);
-//     });
-//       Accel.on('data', function(e) {
-//  // console.log('Just received ' + e.samples + ' from the accelerometer.');
-// });
+    });
+    
+  Accel.on('data', function(e) {  
+      if (isShowingChallengeCard){
+        var tempg = 0;
+          var accel = 0;
+          for (var sc = 0; sc < e.samples; sc++){
+            accel = e.accels[sc];
+            tempg = tempg + (accel.x*accel.y*accel.z);
+          }
+          tempg = tempg/e.samples; //average g over tthe sample range
+          
+          if (tempg > 0){
+            if (!lastGWasPositive){
+              steps ++;
+              console.log("Incrementing steps to " + steps);
+              setDelay();
+            }
+            lastGWasPositive = true;
+          }else{
+            if (lastGWasPositive){
+              steps ++;
+              console.log("Incrementing steps to " + steps);
+              setDelay();
+            }
+            lastGWasPositive = false;
+          }
+      }
+    });
   
- // if (g!==0)
-   // {
-      steps++;
-//       if (steps == 5){
-//         console.log("5 steps taken" , + steps);
-//         showClueCardAtIndex(lastChallengeIndex);
-//         steps = 0;
-//   //    }
-      setDelay();
-//    }
   return steps;
 }
 
+var maxSteps = 5;
 function setDelay(){
+    if (steps == maxSteps){
+      steps = 0;
+      isShowingChallengeCard = false;
+      showClueCardAtIndex(lastChallengeIndex);
+    }
+  
   setTimeout(function(){
-    console.log("Logging steps");
+    if (steps != maxSteps){
+      console.log("count step again after delay");
+      countStep();
+    }  
 }, 400);
   
 }
