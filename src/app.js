@@ -37,43 +37,43 @@ var story = {
   "motive": "The Brother was embezzling money from the Governor. He was found out. During their argument, the Governor pulled a gun on the Brother, who grabbed hold of the closest thing he could find - a lead pipe leftover from a recent renovation, and swung it.",
   "history": [
     {
-      "time":"Monday 10:35 am",
+      "time":"Mon 10:35 am",
       "challenge_text":"You hear someone screaming in the adjoining room",
       "clue_text":"The Wife is complaining on the phone about how there is no money left.",
       "clue_id":0
     },
     {
-      "time":"Monday 12:26 pm",
+      "time":"Mon 12:26 pm",
       "challenge_text":"There is something in the bushes there",
       "clue_text":"You find a bloody red pipe",
       "clue_id":1
     },
     {
-      "time":"Monday 3:41 pm",
+      "time":"Mon 3:41 pm",
       "challenge_text":"You hear muffled sounds nearby",
       "clue_text":"The Secretary is crying in his room. He sees you and quickly wipes his tears. He says that the Governor was a good boss.",
       "clue_id":2
     },
     {
-      "time":"Monday 4:55 pm",
+      "time":"Mon 4:55 pm",
       "challenge_text":"You are walking toward the kitchen. Sounds like running water.",
       "clue_text":"The Brother is washing something in the sink. The water runs red.",
       "clue_id":3
     },
     {
-      "time":"Monday 5:30 pm",
+      "time":"Mon 5:30 pm",
       "challenge_text":"You hear voices arguing in the next room.",
       "clue_text":"The Brother and Secretary are arguing near the fireplace. You hear the words 'millions embezzled'.",
       "clue_id":4
     },
     {
-      "time":"Monday 6:15 pm",
+      "time":"Mon 6:15 pm",
       "challenge_text":"You decide to search the crime scene. Walk to the Governor's study.",
       "clue_text":"There are two ledgers under the Governor's desk. The transactions are over the same quarter but do not match.",
       "clue_id":5
     },
     {
-      "time":"Monday 6:22 pm",
+      "time":"Mon 6:22 pm",
       "challenge_text":"Something moves behind you",
       "clue_text":"Bam ! Everything goes dark.",
       "clue_id":6
@@ -82,24 +82,25 @@ var story = {
 
 //Story Functions
 
-// function getNumberOfChallenges(){
-//   return story.history.length;
-// }
+function getNumberOfChallenges(){
+  return story.history.length;
+}
 
-// function getChallengeTimeAtIndex(index){
-//   return story.history[index].time;
-// }
+function getChallengeTimeAtIndex(index){
+  return story.history[index].time;
+}
 
-// function getChallengeAtIndex(index){
-//   return story.history[index].challenge_text;
-// }
+function getChallengeAtIndex(index){
+  return story.history[index].challenge_text;
+}
 
-// function getClueAtIndex(index){
-//   return story.history[index].clue_text;
-// }
+function getClueAtIndex(index){
+  return story.history[index].clue_text;
+}
 
 
 var UI = require('ui');
+var Vibe = require('ui/vibe');
 //var ajax = require('ajax');
 
 var main = new UI.Card({
@@ -112,32 +113,95 @@ var main = new UI.Card({
 main.show();
 
 main.on('click', 'up', function(e) {
-  
-  doThing();
-//   var menu = new UI.Menu({
-//     sections: [{
-//       items: [{
-//         title: 'Pebble.js',
-//         icon: 'images/menu_icon.png',
-//         subtitle: 'Can do Menus'
-//       }, {
-//         title: 'Second Item',
-//         subtitle: 'Subtitle Text'
-//       }]
-//     }]
-//   });
-//   menu.on('select', function(e) {
-//     console.log('Selected item #' + e.itemIndex + ' of section #' + e.sectionIndex);
-//     console.log('The item is titled "' + e.item.title + '"');
-//   });
-//   menu.show();
+  console.log("Clicked Up from Main Menu");
+//   showSuspectMenu();
+  showChallengeCardAtIndex(0);
 });
 
-// Create a new card in which to show our stellar wearable concepts.
-var conceptCard = new UI.Card({scrollable: true, style: 'small'});
+main.on('click', 'select', function(e) {
+  console.log("Clicked Select from Main Menu");
+  showSuspectMenu();
+});
 
-// We need this function so that we can use it in two different cases.
-function doThing() {
+main.on('click', 'down', function(e) {
+  console.log("Clicked Down from Main Menu");
+  showSuspectMenu();
+});
+
+
+function showChallengeCardAtIndex(index){
+  console.log("Show Challenge Card at Index");
+  
+  var card = new UI.Card();
+  card.title('Walk');
+  card.subtitle(getChallengeTimeAtIndex(index));
+  card.body(getChallengeAtIndex(index));
+  card.show();
+  
+  Vibe.vibrate('short');
+  
+  card.on('click', 'up', function(e) {
+  console.log("Clicked Up from Challenge Card");
+  showClueCardAtIndex(index);
+});
+
+  card.on('click', 'select', function(e) {
+  console.log("Clicked Select from Challenge Card");
+  showClueCardAtIndex(index);
+});
+
+  card.on('click', 'down', function(e) {
+  console.log("Clicked Down from Challenge Card");
+  showClueCardAtIndex(index);
+});
+}
+
+
+
+function showClueCardAtIndex(index){
+  console.log("Show Clue Card at Index");
+  
+  var card = new UI.Card();
+  card.title(getChallengeTimeAtIndex(index));
+  card.body(getClueAtIndex(index));
+  card.show();
+  
+  card.on('click', 'up', function(e) {
+  console.log("Clicked Up from Challenge Card");
+    if (index < (getNumberOfChallenges() -1)){
+       showChallengeCardAtIndex(index+1); 
+    }else{
+      console.log("All clues done");
+      showSuspectMenu();
+    }
+});
+
+  card.on('click', 'select', function(e) {
+  console.log("Clicked Select from Challenge Card");
+  if (index < (getNumberOfChallenges() -1)){
+       showChallengeCardAtIndex(index+1); 
+    }else{
+      console.log("All clues done");
+      showSuspectMenu();
+    }
+});
+
+  card.on('click', 'down', function(e) {
+  console.log("Clicked Down from Challenge Card");
+  if (index < (getNumberOfChallenges() -1)){
+       showChallengeCardAtIndex(index+1); 
+    }else{
+      console.log("All clues done");
+      showSuspectMenu();
+    }
+});
+}
+
+var conceptCard = new UI.Card({scrollable: true, style: 'small'});
+function showSuspectMenu() {
+  
+  console.log("Showing Suspect Menu");
+  
   // Loading this could take some time; it'd be a good idea to show something/
   // while they wait.
   conceptCard.body('Loading...');
@@ -152,8 +216,8 @@ function doThing() {
   fruitMenu.show();
   
   // Add a click listener for select button click
-fruitMenu.on('select', function(event) {
- console.log(" detailCard jjj" );
+  fruitMenu.on('select', function(event) {
+   console.log(" detailCard jjj" );
   // Show a card with clicked item details
   var detailCard = new UI.Card({
     title: story.characters[event.itemIndex].title,
@@ -169,6 +233,7 @@ fruitMenu.on('select', function(event) {
   // Show the new Card
   detailCard.show();
 });
+  
   // This makes a simple 'GET' request to our API; 'type': 'json' makes it parse out
   // the JSON into something we can use.
 //   ajax({url: 'http://wearables-api.herokuapp.com/phrase', 'type': 'json'},
@@ -182,22 +247,3 @@ fruitMenu.on('select', function(event) {
 }
 
 //conceptCard.on('click', 'select', doThing);
-
-main.on('click', 'select', function(e) {
-  // Do the thing! As defined above.
-  doThing();
-  // When they press the select button, we want to get them another quote.
-  // Let's do the thing again.
-  // Finally, make sure it actually shows up on-screen.
- // conceptCard.show();
-  
-});
-
-main.on('click', 'down', function(e) {
-  doThing();
-//   var card = new UI.Card();
-//   card.title('A Card');
-//   card.subtitle('Is a Window');
-//   card.body('The simplest window type in Pebble.js.');
-//   card.show();
-});
