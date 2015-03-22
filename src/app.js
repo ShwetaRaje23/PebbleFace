@@ -4,8 +4,31 @@
  * This is where you write your app.
  */
 
+var people = [
+  {
+    title: "Governor",
+    subtitle: "Green and crispy!"
+  },
+  {
+    title: "Wife",
+    subtitle: "Peel first!"
+  },
+  {
+    title: "Brother",
+    subtitle: "Only three left!"
+  },
+  {
+    title: "Maid",
+    subtitle: "Only three left!"
+  },
+  {
+    title: "Secratary",
+    subtitle: "Only three left!"
+  }
+];
+
 var UI = require('ui');
-var ajax = require('ajax');
+//var ajax = require('ajax');
 
 var main = new UI.Card({
   title: 'Pebble.js',
@@ -44,19 +67,47 @@ function doThing() {
   // Loading this could take some time; it'd be a good idea to show something/
   // while they wait.
   conceptCard.body('Loading...');
+  
+  var fruitMenu = new UI.Menu({
+  sections: [{
+    title: 'Suspect List',
+    items: people
+  }]
+});
+  
+  fruitMenu.show();
+  
+  // Add a click listener for select button click
+fruitMenu.on('select', function(event) {
+ console.log(" detailCard jjj" );
+  // Show a card with clicked item details
+  var detailCard = new UI.Card({
+    title: people[event.itemIndex].title,
+    body: people[event.itemIndex].subtitle
+  });
+  
+ console.log("event     " + event.itemIndex );
+ console.log("Hi");
+  if (event.itemIndex == 2)    
+    detailCard.body(" You have found the killer !");
+  else
+    detailCard.body(" Oops ! You have to try again ");
+  // Show the new Card
+  detailCard.show();
+});
   // This makes a simple 'GET' request to our API; 'type': 'json' makes it parse out
   // the JSON into something we can use.
-  ajax({url: 'http://wearables-api.herokuapp.com/phrase', 'type': 'json'},
-      function(data) {
-        // It worked! Construct a sentence to show on screen.
-        conceptCard.body(data.preamble + " " + data.thing + ".\n\n" + data.action);
-      }, function(data) {
-        // It didn't work. :(
-        conceptCard.body("I don't know. :(");
-      });
+//   ajax({url: 'http://wearables-api.herokuapp.com/phrase', 'type': 'json'},
+//       function(data) {
+//         // It worked! Construct a sentence to show on screen.
+//         conceptCard.body(data.preamble + " " + data.thing + ".\n\n" + data.action);
+//       }, function(data) {
+//         // It didn't work. :(
+//         conceptCard.body("I don't know. :(");
+//       });
 }
 
-conceptCard.on('click', 'select', doThing);
+//conceptCard.on('click', 'select', doThing);
 
 main.on('click', 'select', function(e) {
   // Do the thing! As defined above.
@@ -64,7 +115,8 @@ main.on('click', 'select', function(e) {
   // When they press the select button, we want to get them another quote.
   // Let's do the thing again.
   // Finally, make sure it actually shows up on-screen.
-  conceptCard.show();
+ // conceptCard.show();
+  
 });
 
 main.on('click', 'down', function(e) {
